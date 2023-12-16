@@ -49,10 +49,10 @@ PmergeMe::PmergeMe(int ac, char **av){
     display(Deque);
     std::cout << "Time to process a range of " << Deque.size() << " elements with std::deque container: " << time_q << " us" << std::endl;
     std::cout << "Time to process a range of " << List.size() << " elements with std::list container: " << time_lst << " us" << std::endl;
-    if (Deque == std::deque<int>(List.begin(), List.end()))
-        std::cout << "The sorted sequences are equal." << std::endl;
-    else
-        std::cout << "The sorted sequences are not equal." << std::endl;
+    // if (Deque == std::deque<int>(List.begin(), List.end()))
+    //     std::cout << "The sorted sequences are equal." << std::endl;
+    // else
+    //     std::cout << "The sorted sequences are not equal." << std::endl;
 }
 
 	// Insertion sort algorithm
