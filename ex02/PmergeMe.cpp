@@ -55,48 +55,102 @@ PmergeMe::PmergeMe(int ac, char **av){
     //     std::cout << "The sorted sequences are not equal." << std::endl;
 }
 
-	// Insertion sort algorithm
-		// Loop through the deque starting from the second element (index 1)
-		// Move backward in the deque and shift elements to the right
-        // until finding the correct position for the current element
-		// Insert the current element into the correct position
+void PmergeMe::mergeInsertSortDeque(std::deque<int>& arr) {
+    if (arr.size() <= 100) {
+        insertionSort(arr);
+    } else {
+        std::deque<int>::iterator mid = arr.begin() + arr.size() / 2;
+        std::deque<int> left(arr.begin(), mid);
+        std::deque<int> right(mid, arr.end());
 
-void PmergeMe::mergeInsertSortDeque(std::deque<int>& arr)
-{
-    std::deque<int>::iterator it1, it2;
-	// we can access random value in deque by using operators like +, -, +=, -=, [], etc.
-    for (it1 = arr.begin() + 1; it1 != arr.end(); ++it1)
-    {
-		// Store the current element in a temporary variable
-        int temp = *it1;
+        mergeInsertSortDeque(left);
+        mergeInsertSortDeque(right);
 
-		// Initialize the second iterator to the current position
-        it2 = it1;
-
-    	//std::prev to get an iterator pointing to the preceding element
-        while (it2 != arr.begin() && *(std::prev(it2)) > temp)
-        {
-            *it2 = *(std::prev(it2)); // shift elements to the right
-            std::advance(it2, -1); // move iterator backward
-        }
-        *it2 = temp;
+        merge(left.begin(), left.end(), right.end());
     }
 }
 
-void PmergeMe::mergeInsertSortList(std::list<int>& arr)
-{
-    std::list<int>::iterator it1, it2;
-	// we cant access random value in list by using operators like +, -, +=, -=, [], etc., instead we should traverse the list usingg ++, --, etc.
-    for (it1 = ++arr.begin(); it1 != arr.end(); ++it1)
-    {
+void PmergeMe::merge(std::deque<int>::iterator left, std::deque<int>::iterator mid, std::deque<int>::iterator right) {
+    std::deque<int> merged;
+    std::deque<int>::iterator it1 = left;
+    std::deque<int>::iterator it2 = mid;
+
+    while (it1 != mid && it2 != right) {
+        if (*it1 <= *it2) {
+            merged.push_back(*it1);
+            ++it1;
+        } else {
+            merged.push_back(*it2);
+            ++it2;
+        }
+    }
+
+    std::copy(it1, mid, std::back_inserter(merged));
+    std::copy(it2, right, std::back_inserter(merged));
+    std::copy(merged.begin(), merged.end(), left);
+}
+
+void PmergeMe::insertionSort(std::deque<int>& arr) {
+    for (std::deque<int>::iterator it1 = arr.begin() + 1; it1 != arr.end(); ++it1) {
         int temp = *it1;
-        it2 = it1;
-        while (it2 != arr.begin() && *(std::prev(it2)) > temp)
-        {
+        std::deque<int>::iterator it2 = it1;
+
+        while (it2 != arr.begin() && *(std::prev(it2)) > temp) {
             *it2 = *(std::prev(it2));
             std::advance(it2, -1);
         }
+
         *it2 = temp;
     }
 }
 
+void PmergeMe::mergeInsertSortList(std::list<int>& arr) {
+
+    if (arr.size() <= 100) {
+        insertionSort(arr);
+    } else {
+        std::list<int>::iterator mid = std::next(arr.begin(), arr.size() / 2);
+        std::list<int> left(arr.begin(), mid);
+        std::list<int> right(mid, arr.end());
+
+        mergeInsertSortList(left);
+        mergeInsertSortList(right);
+
+        merge(arr, left.begin(), left.end(), right.end());
+    }
+}
+
+void PmergeMe::merge(std::list<int>& arr, std::list<int>::iterator left, std::list<int>::iterator mid, std::list<int>::iterator right) {
+    std::list<int> merged;
+    std::list<int>::iterator it1 = left;
+    std::list<int>::iterator it2 = mid;
+
+    while (it1 != mid && it2 != right) {
+        if (*it1 <= *it2) {
+            merged.push_back(*it1);
+            ++it1;
+        } else {
+            merged.push_back(*it2);
+            ++it2;
+        }
+    }
+
+    merged.splice(merged.end(), arr, it1, mid);
+    merged.splice(merged.end(), arr, it2, right);
+
+    // Using splice to efficiently move the sorted range back into the original list
+    arr.splice(left, merged);
+}
+
+void PmergeMe::insertionSort(std::list<int>& arr) {
+    for (std::list<int>::iterator it1 = std::next(arr.begin()); it1 != arr.end(); ++it1) {
+        int temp = *it1;
+        std::list<int>::iterator it2 = it1;
+
+        while (it2 != arr.begin() && *(std::prev(it2)) > temp) {
+            std::advance(it2, -1);
+        }
+        // Using splice to efficiently insert the element to its correct position
+        arr.splice(it2, arr, it1);
+    }
+}
