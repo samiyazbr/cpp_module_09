@@ -49,28 +49,33 @@ PmergeMe::PmergeMe(int ac, char **av){
     display(Deque);
     std::cout << "Time to process a range of " << Deque.size() << " elements with std::deque container: " << time_q << " us" << std::endl;
     std::cout << "Time to process a range of " << List.size() << " elements with std::list container: " << time_lst << " us" << std::endl;
-    // if (Deque == std::deque<int>(List.begin(), List.end()))
-    //     std::cout << "The sorted sequences are equal." << std::endl;
-    // else
-    //     std::cout << "The sorted sequences are not equal." << std::endl;
+    if (Deque == std::deque<int>(List.begin(), List.end()))
+        std::cout << "The sorted sequences are equal." << std::endl;
+    else
+        std::cout << "The sorted sequences are not equal." << std::endl;
 }
 
+// ========================================================================================================== //
+// for deque random access iterator is used
 void PmergeMe::mergeInsertSortDeque(std::deque<int>& arr) {
+
     if (arr.size() <= 100) {
-        insertionSort(arr);
+        insertionSort_deque(arr);
     } else {
-        std::deque<int>::iterator mid = arr.begin() + arr.size() / 2;
+        std::deque<int>::iterator mid = arr.begin();
+        std::advance(mid, arr.size() / 2);
+
         std::deque<int> left(arr.begin(), mid);
         std::deque<int> right(mid, arr.end());
 
         mergeInsertSortDeque(left);
         mergeInsertSortDeque(right);
 
-        merge(left.begin(), left.end(), right.end());
+        merge_deque(left.begin(), left.end(), right.end());
     }
 }
 
-void PmergeMe::merge(std::deque<int>::iterator left, std::deque<int>::iterator mid, std::deque<int>::iterator right) {
+void PmergeMe::merge_deque(std::deque<int>::iterator left, std::deque<int>::iterator mid, std::deque<int>::iterator right) {
     std::deque<int> merged;
     std::deque<int>::iterator it1 = left;
     std::deque<int>::iterator it2 = mid;
@@ -87,40 +92,42 @@ void PmergeMe::merge(std::deque<int>::iterator left, std::deque<int>::iterator m
 
     std::copy(it1, mid, std::back_inserter(merged));
     std::copy(it2, right, std::back_inserter(merged));
+
     std::copy(merged.begin(), merged.end(), left);
 }
 
-void PmergeMe::insertionSort(std::deque<int>& arr) {
+void PmergeMe::insertionSort_deque(std::deque<int>& arr) {
     for (std::deque<int>::iterator it1 = arr.begin() + 1; it1 != arr.end(); ++it1) {
         int temp = *it1;
         std::deque<int>::iterator it2 = it1;
 
-        while (it2 != arr.begin() && *(std::prev(it2)) > temp) {
-            *it2 = *(std::prev(it2));
-            std::advance(it2, -1);
+        while (it2 != arr.begin() && *(--it2) > temp) {
+            std::iter_swap(it2, std::next(it2));
+            --it2;
         }
 
         *it2 = temp;
     }
 }
-
+ // ========================================================================================================== //
 void PmergeMe::mergeInsertSortList(std::list<int>& arr) {
-
     if (arr.size() <= 100) {
-        insertionSort(arr);
+        insertionSort_list(arr);
     } else {
-        std::list<int>::iterator mid = std::next(arr.begin(), arr.size() / 2);
+        std::list<int>::iterator mid = arr.begin();
+        std::advance(mid, arr.size() / 2);
+
         std::list<int> left(arr.begin(), mid);
         std::list<int> right(mid, arr.end());
 
         mergeInsertSortList(left);
         mergeInsertSortList(right);
 
-        merge(arr, left.begin(), left.end(), right.end());
+        merge_list(left.begin(), left.end(), right.end());
     }
 }
 
-void PmergeMe::merge(std::list<int>& arr, std::list<int>::iterator left, std::list<int>::iterator mid, std::list<int>::iterator right) {
+void PmergeMe::merge_list(std::list<int>::iterator left, std::list<int>::iterator mid, std::list<int>::iterator right) {
     std::list<int> merged;
     std::list<int>::iterator it1 = left;
     std::list<int>::iterator it2 = mid;
@@ -135,22 +142,30 @@ void PmergeMe::merge(std::list<int>& arr, std::list<int>::iterator left, std::li
         }
     }
 
-    merged.splice(merged.end(), arr, it1, mid);
-    merged.splice(merged.end(), arr, it2, right);
+    while (it1 != mid) {
+        merged.push_back(*it1);
+        ++it1;
+    }
 
-    // Using splice to efficiently move the sorted range back into the original list
-    arr.splice(left, merged);
+    while (it2 != right) {
+        merged.push_back(*it2);
+        ++it2;
+    }
+
+    std::copy(merged.begin(), merged.end(), left);
 }
 
-void PmergeMe::insertionSort(std::list<int>& arr) {
-    for (std::list<int>::iterator it1 = std::next(arr.begin()); it1 != arr.end(); ++it1) {
+void PmergeMe::insertionSort_list(std::list<int>& arr) {
+    for (std::list<int>::iterator it1 = ++arr.begin(); it1 != arr.end(); ++it1) {
         int temp = *it1;
         std::list<int>::iterator it2 = it1;
 
-        while (it2 != arr.begin() && *(std::prev(it2)) > temp) {
+        while (it2 != arr.begin() && *(--it2) > temp) {
+            std::advance(it2, 1);
+            *it2 = *(std::prev(it2));
             std::advance(it2, -1);
         }
-        // Using splice to efficiently insert the element to its correct position
-        arr.splice(it2, arr, it1);
+
+        *it2 = temp;
     }
 }
