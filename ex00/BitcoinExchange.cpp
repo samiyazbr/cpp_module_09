@@ -110,48 +110,9 @@ static std::string& trim(std::string& s)
     return trim_start(trim_end(s));
 }
 
-int BitcoinExchange::parse_date(std::string date)
-{
-	std::vector<std::string> date_vector;
-	date_vector = this->splitline(date, '-');
-	if (date_vector.size() != 3)
-		return (1);
-	if (date_vector[0].length() != 4 || date_vector[1].length() != 2 || date_vector[2].length() != 2)
-		return (1);
-	try
-	{
-		int year = std::stoi(date_vector[0]);
-		int month = std::stoi(date_vector[1]);
-		int day = std::stoi(date_vector[2]);
-		if (year < 2009 || year > 2022)
-			return (1);
-		if (month < 1 || month > 12)
-			return (1);
-		if (year % 4 == 0 && month == 2 && day > 29)
-			return (1);
-		if (year % 4 != 0 && month == 2 && day > 28)
-			return (1);
-		if (month == 4 || month == 6 || month == 9 || month == 11)
-		{
-			if (day < 1 || day > 30)
-				return (1);
-		}
-		if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12)
-		{
-			if (day < 1 || day > 31)
-				return (1);
-		}
-		return (0);
-	}
-	catch (const std::exception &e)
-	{
-		(void)e;
-		return (1);
-	}
-}
-
 void BitcoinExchange::readInputfile(std::string inputfilePath)
 {
+	int i = 0;
 	std::ifstream file2(inputfilePath);
 	if (!file2.is_open())
 	{
@@ -162,6 +123,11 @@ void BitcoinExchange::readInputfile(std::string inputfilePath)
 	std::vector<std::string> vectorLine;
 	while(std::getline(file2, line))
 	{
+		if (i == 0)
+		{
+			i = 1;
+			continue;
+		}
 		vectorLine = this->splitline(line, '|');
 		if (vectorLine[1].length() == 0 || vectorLine.size() < 2)
 		{
@@ -169,11 +135,6 @@ void BitcoinExchange::readInputfile(std::string inputfilePath)
 			continue;
 		}
 		std::map<std::string, double>::iterator it = this->_data.upper_bound(trim(vectorLine[0]));
-		if (parse_date(trim(vectorLine[0])) == 1)
-		{
-			std::cout << "Error: bad input => " << vectorLine[0] << std::endl;
-			continue;
-		}
 		if (it != this->_data.end()) {
 	        std::pair<std::string, double> p = *(--it);
 			try

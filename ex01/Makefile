@@ -10,12 +10,12 @@ CXXFLAGS		=	-std=c++98 -Wall -Wextra -Werror
 RM			=	rm -rf
 
 %.o : %.cpp
-			$(CXX) $(CXXFLAGS) -c $< -o $@
+			$(CXX) $(FLAGS) -c $< -o $@
 
 all:		$(NAME)
 
 $(NAME):	$(OBJS)
-			@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+			@$(CXX) $(FLAGS) $(OBJS) -o $(NAME)
 
 clean:
 			@$(RM) $(OBJS)

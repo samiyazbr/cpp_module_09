@@ -27,7 +27,6 @@ class BitcoinExchange
 
 	std::map<std::string, double> getData();
 	std::vector<std::string> splitline(std::string str, char seperator);
-	int parse_date(std::string date);
 };
 
 #endif
