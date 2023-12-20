@@ -143,25 +143,25 @@ static void insertion_sort_list(std::list<int>& lst) {
 }
 
 static void merge_list(std::list<int>& lst, std::list<int>& left, std::list<int>& right) {
-    std::list<int>::iterator it_lst = lst.begin();
-    std::list<int>::iterator it_left = left.begin();
-    std::list<int>::iterator it_right = right.begin();
+        std::list<int>::iterator it_lst = lst.begin();
+        std::list<int>::iterator it_left = left.begin();
+        std::list<int>::iterator it_right = right.begin();
 
-    while (it_left != left.end() && it_right != right.end()) {
-        if (*it_left <= *it_right) {
-            *it_lst = *it_left;
-            ++it_left;
-        } else {
-            *it_lst = *it_right;
-            ++it_right;
+        while (it_left != left.end() && it_right != right.end()) {
+            if (*it_left <= *it_right) {
+                *it_lst = *it_left;
+                ++it_left;
+            } else {
+                *it_lst = *it_right;
+                ++it_right;
+            }
+            ++it_lst;
         }
-        ++it_lst;
-    }
 
-    // Copy the remaining elements of left and right, if any
-    std::copy(it_left, left.end(), std::inserter(lst, it_lst));
-    std::copy(it_right, right.end(), std::inserter(lst, it_lst));
-}
+        // Copy the remaining elements of left and right, if any
+        std::copy(it_left, left.end(), std::inserter(lst, lst.end()));
+        std::copy(it_right, right.end(), std::inserter(lst, lst.end()));
+    }
 
 void PmergeMe::merge_Insert_Sort_List(std::list<int>& lst) {
     if (lst.size() < 2) {
