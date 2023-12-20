@@ -2,6 +2,7 @@
 #include <deque>
 #include <list>
 #include <ctime>
+#include <algorithm> // for srand,atoi, exit 
 #include <iterator> // for std::advance
 
 
