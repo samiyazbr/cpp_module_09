@@ -1,6 +1,22 @@
 #include "PmergeMe.hpp"
 
 PmergeMe::PmergeMe(){}
+
+PmergeMe::~PmergeMe(){}
+
+PmergeMe::PmergeMe(PmergeMe const &copy)
+{
+    *this = copy;
+}
+
+PmergeMe &PmergeMe::operator=(PmergeMe const &rhs)
+{
+	(void)rhs;
+	return (*this);
+}
+
+
+
 template <typename T>
 void PmergeMe::display(const T& container)
 {
@@ -32,7 +48,7 @@ PmergeMe::PmergeMe(int ac, char **av){
     display(Deque);
 
     clock_t start_q = clock();
-    mergeInsertSortDeque(Deque);
+    merge_Insert_Sort_Deque(Deque);
     clock_t end_q = clock();
 	// clock_t is a type that holds clock ticks.
 	// CLOCKS_PER_SEC is a constant that holds the number of clock ticks per second.
@@ -41,7 +57,7 @@ PmergeMe::PmergeMe(int ac, char **av){
 	// We divide that by CLOCKS_PER_SEC to get the number of seconds it took to sort the deque.
 
     clock_t start_lst = clock();
-    mergeInsertSortList(List);
+    merge_Insert_Sort_List(List);
     clock_t end_lst = clock();
     double time_lst = static_cast<double>(end_lst - start_lst) / CLOCKS_PER_SEC * 1000;
 
@@ -55,117 +71,119 @@ PmergeMe::PmergeMe(int ac, char **av){
         std::cout << "The sorted sequences are not equal." << std::endl;
 }
 
-// ========================================================================================================== //
-// for deque random access iterator is used
-void PmergeMe::mergeInsertSortDeque(std::deque<int>& arr) {
-
-    if (arr.size() <= 100) {
-        insertionSort_deque(arr);
-    } else {
-        std::deque<int>::iterator mid = arr.begin();
-        std::advance(mid, arr.size() / 2);
-
-        std::deque<int> left(arr.begin(), mid);
-        std::deque<int> right(mid, arr.end());
-
-        mergeInsertSortDeque(left);
-        mergeInsertSortDeque(right);
-
-        merge_deque(left.begin(), left.end(), right.end());
-    }
-}
-
-void PmergeMe::merge_deque(std::deque<int>::iterator left, std::deque<int>::iterator mid, std::deque<int>::iterator right) {
-    std::deque<int> merged;
-    std::deque<int>::iterator it1 = left;
-    std::deque<int>::iterator it2 = mid;
-
-    while (it1 != mid && it2 != right) {
-        if (*it1 <= *it2) {
-            merged.push_back(*it1);
-            ++it1;
-        } else {
-            merged.push_back(*it2);
-            ++it2;
-        }
-    }
-
-    std::copy(it1, mid, std::back_inserter(merged));
-    std::copy(it2, right, std::back_inserter(merged));
-
-    std::copy(merged.begin(), merged.end(), left);
-}
-
-void PmergeMe::insertionSort_deque(std::deque<int>& arr) {
+ //========================================== PmergeMe::merge_Insert_Sort_Deque ==========================================//
+static void insertion_sort_deque(std::deque<int>& arr) {
     for (std::deque<int>::iterator it1 = arr.begin() + 1; it1 != arr.end(); ++it1) {
         int temp = *it1;
         std::deque<int>::iterator it2 = it1;
-
-        while (it2 != arr.begin() && *(--it2) > temp) {
-            std::iter_swap(it2, std::next(it2));
-            --it2;
-        }
-
-        *it2 = temp;
-    }
-}
- // ========================================================================================================== //
-void PmergeMe::mergeInsertSortList(std::list<int>& arr) {
-    if (arr.size() <= 100) {
-        insertionSort_list(arr);
-    } else {
-        std::list<int>::iterator mid = arr.begin();
-        std::advance(mid, arr.size() / 2);
-
-        std::list<int> left(arr.begin(), mid);
-        std::list<int> right(mid, arr.end());
-
-        mergeInsertSortList(left);
-        mergeInsertSortList(right);
-
-        merge_list(left.begin(), left.end(), right.end());
-    }
-}
-
-void PmergeMe::merge_list(std::list<int>::iterator left, std::list<int>::iterator mid, std::list<int>::iterator right) {
-    std::list<int> merged;
-    std::list<int>::iterator it1 = left;
-    std::list<int>::iterator it2 = mid;
-
-    while (it1 != mid && it2 != right) {
-        if (*it1 <= *it2) {
-            merged.push_back(*it1);
-            ++it1;
-        } else {
-            merged.push_back(*it2);
-            ++it2;
-        }
-    }
-
-    while (it1 != mid) {
-        merged.push_back(*it1);
-        ++it1;
-    }
-
-    while (it2 != right) {
-        merged.push_back(*it2);
-        ++it2;
-    }
-
-    std::copy(merged.begin(), merged.end(), left);
-}
-
-void PmergeMe::insertionSort_list(std::list<int>& arr) {
-    for (std::list<int>::iterator it1 = ++arr.begin(); it1 != arr.end(); ++it1) {
-        int temp = *it1;
-        std::list<int>::iterator it2 = it1;
-
-        while (it2 != arr.begin() && *(--it2) > temp) {
-            std::advance(it2, 1);
-            *it2 = *(std::prev(it2));
+        while (it2 != arr.begin() && *(prev_it(it2)) > temp) {
+            *it2 = *(prev_it(it2));
             std::advance(it2, -1);
         }
-
         *it2 = temp;
     }
 }
+
+static void merge_deque(std::deque<int>& arr, std::deque<int>& left, std::deque<int>& right) {
+    std::deque<int>::iterator it_arr = arr.begin();
+    std::deque<int>::iterator it_left = left.begin();
+    std::deque<int>::iterator it_right = right.begin();
+
+    while (it_left != left.end() && it_right != right.end()) {
+        if (*it_left <= *it_right) {
+            *it_arr = *it_left;
+            ++it_left;
+        } else {
+            *it_arr = *it_right;
+            ++it_right;
+        }
+        ++it_arr;
+    }
+
+    // Copy the remaining elements of left and right, if any
+    std::copy(it_left, left.end(), it_arr);
+    std::copy(it_right, right.end(), it_arr);
+}
+
+void PmergeMe::merge_Insert_Sort_Deque(std::deque<int>& arr) {
+    if (arr.size() < 2) {
+        return; // Already sorted
+    }
+
+    // Use insertion sort for small subarrays
+    if (arr.size() <= 50) {
+        insertion_sort_deque(arr);
+    } else {
+        // Divide the array into two halves
+        std::deque<int>::iterator middle = arr.begin() + arr.size() / 2;
+        
+        // Recursively sort each half
+        std::deque<int> left(arr.begin(), middle);
+        std::deque<int> right(middle, arr.end());
+        merge_Insert_Sort_Deque(left);
+        merge_Insert_Sort_Deque(right);
+
+        // Merge the sorted halves
+        merge_deque(arr, left, right);
+    }
+}
+
+//========================================== PmergeMe::merge_Insert_Sort_List ==========================================//
+
+static void insertion_sort_list(std::list<int>& lst) {
+    for (std::list<int>::iterator it1 = next_it(lst.begin()); it1 != lst.end(); ++it1) {
+        int temp = *it1;
+        std::list<int>::iterator it2 = it1;
+        while (it2 != lst.begin() && *(prev_it(it2)) > temp) {
+            *it2 = *(prev_it(it2));
+            --it2;
+        }
+        *it2 = temp;
+    }
+}
+
+static void merge_list(std::list<int>& lst, std::list<int>& left, std::list<int>& right) {
+    std::list<int>::iterator it_lst = lst.begin();
+    std::list<int>::iterator it_left = left.begin();
+    std::list<int>::iterator it_right = right.begin();
+
+    while (it_left != left.end() && it_right != right.end()) {
+        if (*it_left <= *it_right) {
+            *it_lst = *it_left;
+            ++it_left;
+        } else {
+            *it_lst = *it_right;
+            ++it_right;
+        }
+        ++it_lst;
+    }
+
+    // Copy the remaining elements of left and right, if any
+    std::copy(it_left, left.end(), std::inserter(lst, it_lst));
+    std::copy(it_right, right.end(), std::inserter(lst, it_lst));
+}
+
+void PmergeMe::merge_Insert_Sort_List(std::list<int>& lst) {
+    if (lst.size() < 2) {
+        return; // Already sorted
+    }
+
+    // Use insertion sort for small sublists
+    if (lst.size() <= 50) {
+        insertion_sort_list(lst);
+    } else {
+        // Divide the list into two halves
+        std::list<int>::iterator middle = lst.begin();
+        std::advance(middle, lst.size() / 2);
+        
+        // Recursively sort each half
+        std::list<int> left(lst.begin(), middle);
+        std::list<int> right(middle, lst.end());
+        merge_Insert_Sort_List(left);
+        merge_Insert_Sort_List(right);
+
+        // Merge the sorted halves
+        merge_list(lst, left, right);
+    }
+}
+
