@@ -9,6 +9,9 @@
 
 class PmergeMe
 {
+private:
+	std::deque<int> Deque;
+    std::list<int> List;
 	public:
 	PmergeMe();
     PmergeMe(int ac, char **av);

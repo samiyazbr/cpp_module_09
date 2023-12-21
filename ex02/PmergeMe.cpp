@@ -28,9 +28,6 @@ void PmergeMe::display(const T& container)
 
 PmergeMe::PmergeMe(int ac, char **av){
 
-    std::deque<int> Deque;
-    std::list<int> List;
-
     // fill the containers with random integers
     srand(time(NULL));
     for (int i = 1; i < ac; ++i)
@@ -99,10 +96,22 @@ static void merge_deque(std::deque<int>& arr, std::deque<int>& left, std::deque<
         }
         ++it_arr;
     }
+	while (it_left != left.end())
+	{
+		*it_arr = *it_left;
+        ++it_left;
+		++it_arr;
+	}
+	while (it_right != right.end())
+	{
+		*it_arr = *it_right;
+        ++it_right;
+		++it_arr;
 
+	}
     // Copy the remaining elements of left and right, if any
-    std::copy(it_left, left.end(), it_arr);
-    std::copy(it_right, right.end(), it_arr);
+    //std::copy(it_left, left.end(), it_arr);
+    //std::copy(it_right, right.end(), it_arr);
 }
 
 void PmergeMe::merge_Insert_Sort_Deque(std::deque<int>& arr) {
@@ -111,7 +120,7 @@ void PmergeMe::merge_Insert_Sort_Deque(std::deque<int>& arr) {
     }
 
     // Use insertion sort for small subarrays
-    if (arr.size() <= 50) {
+    if (arr.size() <= 5) {
         insertion_sort_deque(arr);
     } else {
         // Divide the array into two halves
@@ -146,7 +155,6 @@ static void merge_list(std::list<int>& lst, std::list<int>& left, std::list<int>
         std::list<int>::iterator it_lst = lst.begin();
         std::list<int>::iterator it_left = left.begin();
         std::list<int>::iterator it_right = right.begin();
-
         while (it_left != left.end() && it_right != right.end()) {
             if (*it_left <= *it_right) {
                 *it_lst = *it_left;
@@ -157,10 +165,18 @@ static void merge_list(std::list<int>& lst, std::list<int>& left, std::list<int>
             }
             ++it_lst;
         }
-
-        // Copy the remaining elements of left and right, if any
-        std::copy(it_left, left.end(), std::inserter(lst, lst.end()));
-        std::copy(it_right, right.end(), std::inserter(lst, lst.end()));
+		while (it_left != left.end())
+		{
+			*it_lst = *it_left;
+               ++it_left;
+			   ++it_lst;
+		}
+		while (it_right != right.end())
+		{
+			*it_lst = *it_right;
+              ++it_right;
+			  ++it_lst;
+		}
     }
 
 void PmergeMe::merge_Insert_Sort_List(std::list<int>& lst) {
@@ -169,7 +185,7 @@ void PmergeMe::merge_Insert_Sort_List(std::list<int>& lst) {
     }
 
     // Use insertion sort for small sublists
-    if (lst.size() <= 50) {
+    if (lst.size() <= 5) {
         insertion_sort_list(lst);
     } else {
         // Divide the list into two halves
@@ -186,4 +202,5 @@ void PmergeMe::merge_Insert_Sort_List(std::list<int>& lst) {
         merge_list(lst, left, right);
     }
 }
+
 
